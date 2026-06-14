@@ -1,0 +1,55 @@
+Package: xorgxrdp
+Architecture: amd64
+Version: 1:0.10.5-2~fleet3~ubuntu22.04
+Priority: optional
+Section: net
+Maintainer: Debian Remote Maintainers <debian-remote@lists.debian.org>
+Installed-Size: 221
+Provides: xorg-driver-input, xorg-driver-video
+Depends: libc6 (>= 2.34), libepoxy0 (>= 1.0), xorg-input-abi-24, xorg-video-abi-25, xserver-xorg-core (>= 2:21.1.1)
+Recommends: xorg
+Filename: pool/jammy/main/xorgxrdp_0.10.5-2~fleet3~ubuntu22.04_amd64.deb
+Size: 71370
+MD5sum: 26d52d72ca2f1ff99e8027a1d8a822fd
+SHA1: 27fcf2320cd6006ed59b87e2931c3857a136a0b0
+SHA256: a908d2867c8c2f4904fc86f15234cc2bdf70fba9c79f18c02d5e91b09b795eab
+SHA512: 11273b2faff323774f4698a0925b09eee34272a25fb020b540097bb6fbcd3102c5930086f80ac1afcfee9e50f7c3d7dd07ee9d257e839a602caa448ae7864353
+Homepage: https://www.xrdp.org/
+Description: Remote Desktop Protocol (RDP) modules for X.org
+ xorgxrdp is a set of drivers (screen device, keyboard, and mouse)
+ for X.org enabling use through an RDP session with xrdp. For full
+ operation, most standard X11 fonts and tools need to be installed;
+ the Recommended xorg metapackage is a superset of what’s actually
+ needed but will do.
+
+Package: xrdp
+Architecture: amd64
+Version: 0.10.6-5~fleet3~ubuntu22.04
+Section: net
+Maintainer: Debian Remote Maintainers <debian-remote@lists.debian.org>
+Installed-Size: 4607
+Pre-Depends: init-system-helpers (>= 1.54~)
+Depends: adduser, lsb-base, ssl-cert, libc6 (>= 2.34), libfuse3-3 (>= 3.7.0), libjpeg8 (>= 8c), libmp3lame0 (>= 3.100), libopenh264-6 (>= 2.2.0+dfsg), libopus0 (>= 1.1), libpam0g (>= 0.99.7.1), libssl3 (>= 3.0.0~~alpha1), libx11-6, libx264-163 (>= 2:0.163.3060+git5db6aa6), libxfixes3, libxrandr2 (>= 2:1.2.0)
+Recommends: pipewire-module-xrdp, xorgxrdp
+Suggests: guacamole
+Filename: pool/jammy/main/xrdp_0.10.6-5~fleet3~ubuntu22.04_amd64.deb
+Size: 699400
+MD5sum: 03e7e55476b50508551ecabe8f2e0979
+SHA1: 228d89988ebd43f285d7c074e6c7652eb0cde46f
+SHA256: f3fcb71b5ebc5859fd4b87f564151de5d7970c4c556dea2cfd3c2bee2c5f83f1
+SHA512: 3e827aac878dfff88db772b151f60ee26b0b6fe3d84140a3fce340645bd923f2fdde91b1d539e8ae9a7f6df39fa4782208f1f26cd8eca700624113d2ff235a71
+Homepage: https://www.xrdp.org/
+Description: Remote Desktop Protocol (RDP) server
+ xrdp offers a graphical login to a remote client using
+ RDP (the Remote Desktop Protocol). xrdp can connect to
+ a locally created X.org session with the xorgxrdp drivers,
+ to a VNC X11 server, and forward to another RDP server.
+ .
+ xrdp accepts connections from freerdp, rdesktop, and the
+ built-in terminal server / remote desktop clients of
+ Microsoft Windows operating systems.
+ In the xorgxrdp (which replaces X11RDP) and VNC modes,
+ it provides a fully functional Linux terminal server,
+ offering an X-Window desktop to the user. In the RDP
+ or VNC forwarding mode, any sort of desktop can be used.
+

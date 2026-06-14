@@ -1,0 +1,51 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+Acquire-By-Hash: yes
+Architectures: amd64
+Codename: jammy
+Components: main
+Date: Sun, 14 Jun 2026 11:45:02 +0000
+Label: fleet-xrdp
+Origin: fleet-xrdp
+Suite: jammy
+MD5Sum:
+ a869681c46e873711c286a6b8064b2c7              163 Release
+ 314e82d97ec019445a35a2f5375cf95d             6819 main/Contents-amd64
+ b8b2fa654ca054888440f9ead092515b              993 main/Contents-amd64.gz
+ d9d15576604ee57ca17a4ea5e130f0f0             2810 main/binary-amd64/Packages
+ 2f4ba394b397e47fe921c7b3768fbd94             1490 main/binary-amd64/Packages.gz
+SHA1:
+ d516023590f65dffc0b2ca2956bac2de448d04c6              163 Release
+ 08cf03a172fffd4da2a369b3413e7864e51f976a             6819 main/Contents-amd64
+ 68b5b5f68610662a1e34314ac985250121fd869e              993 main/Contents-amd64.gz
+ e9acff8698d2a7105548b83e0337681da289b0af             2810 main/binary-amd64/Packages
+ 366aad46782ca2469ef8919910968eefdc8b455d             1490 main/binary-amd64/Packages.gz
+SHA256:
+ bacc2f58a2df8a3161778eafe9f834bffaf262b6f39aa75d63804b5e47864836              163 Release
+ 5879f5cc7a3a0b9269c3eee1b6bb8034f9cbbd2a5c349878e2d1cb250ca9fd53             6819 main/Contents-amd64
+ 286f6ffbb1a65aec61a80611e5d14407ad3c34822fa92fd9e2de6baf202b780e              993 main/Contents-amd64.gz
+ 5f0b3d78002e4b01b6bae84f2a095952b1da05071fbf11ee9715bc7c37627256             2810 main/binary-amd64/Packages
+ 0810a81c21184e7903df177df748d705ede56b7f6ad611fceae6447203b54cda             1490 main/binary-amd64/Packages.gz
+SHA512:
+ 5cdbf122b6c533ceb029fbd2042a9b63ad2f479e3d67ac5bbb3e6af6bc80f2b0eb0c58232073be47169986ae4e84ba8c8ce034b8f6d0b05232b5e22961cfc816              163 Release
+ fc468cbcec685ce1dd56264e4e2ddb74c66add536085b092c3ecf3fcc27b165dc72c65d2b9fc6d5daba92aa9a4fe1d1ea8de01f87bbb785e0b1c40471dac6db7             6819 main/Contents-amd64
+ 7234cb4d288ada645b62109cad9d33ebe8e0d66e455230a9fd6221c40d06a25f5e2794e6d4da1b713282ae99f7a1ab08a6736bd855eb7ae164006a7a087f8bf6              993 main/Contents-amd64.gz
+ 5b14370766de74ab7a455241dacff14fbd71a8e99fb95b14848c893f12b343f75fa564339f5057ce34547f4ed1eeca528a52dcca8ae73e6e44b44ac778a1995f             2810 main/binary-amd64/Packages
+ bb6607f3facafa6b26021b14cca705fa114660a75cf49559f19d17006e449f614037ee8d9870ef2fa7db7ca5e1fae32f34908e1e908df568f89ab2d51bac57dd             1490 main/binary-amd64/Packages.gz
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEE+IgRcLCDBxdnQegtbmoFrJVyBWcFAmoulD4ACgkQbmoFrJVy
+BWdYrBAAmYby/frKwoSAraf8iXAjq9Cwi/MajcewWVYjnYzjZydT+6kY6ciX4v9i
+yJxZqHX36BxYCs6jz/qUx5Gte/WfbNtEdXNgRXbcrO8cqIogLSqjvaONu1ARbf0x
+3fRFc+gj5fFFR8DQRmIr6u2bbt8NPccJEYi6gXaDldHw5cDaHOmCXeOD0tZfg7Nk
+3SAYVkEarrmU7nk5+TCSsovCUacPj6iGRHXInBzQZrCy0PptJrwhk2xyk4IDnVpr
+2hEdyom6mLHBdOVGR88NlgDKzTfy8vOymp1iBzvRKFhbMplffHuX95aVu+u9Sk05
+dk/RO2QNwW9NZZ95ZMFFP5h6iE8NUAQmuyricoU6uk/RNDkEHdL+mdmL50AdP1N8
+RBwH5RcRJDZU6N1lRkXEM0haEawTg3rsI1V+XKw2z34PfxOGCHIseQjwgUiratPE
+ZYPuIo+bC5MNKlWKoXSuBi1Vf7DNZG/H5beeJfmf9mjKPA6RSOAvn2Vt4zDaIJ3w
+P0I2DlATnotz2K19qp6EPlRWVF7u8lQsBWZfmd5wucXvKYHIChkqW6PiQfiP41a7
+GIhz5Zpq1Mc5euMTz2l4BZUSaHeanX7W8JPsyc/dd7zXWhIFNcEmRcNBJi7hWAns
+3b2G7t+80TP7A78zolXfCoD1j5jSyH2NTAuE/6Y5CB4Ck6WTLEU=
+=m556
+-----END PGP SIGNATURE-----

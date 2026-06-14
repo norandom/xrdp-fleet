@@ -1,0 +1,32 @@
+Acquire-By-Hash: yes
+Architectures: amd64
+Codename: noble
+Components: main
+Date: Sun, 14 Jun 2026 11:45:02 +0000
+Label: fleet-xrdp
+Origin: fleet-xrdp
+Suite: noble
+MD5Sum:
+ 7ddd4b9d832df119b1aa8bfb45ea4b80              163 Release
+ 3d9d75cb4425a35277e59339610125ea             6927 main/Contents-amd64
+ e614d728da62c3fe34889830351182fc             1017 main/Contents-amd64.gz
+ 50af9292217ca1d3c589428b5bf51af5             2823 main/binary-amd64/Packages
+ 2f66b2416fd32602e1c194a5b847dde0             1500 main/binary-amd64/Packages.gz
+SHA1:
+ e0c175d188e9f0155390e04a90b537fe0172b8b8              163 Release
+ aedca2e51a0ed563f1f810deed9f4226fd5f5d26             6927 main/Contents-amd64
+ b7a57808e9cf2b8d03b6fcb49924f7b6a743fdbd             1017 main/Contents-amd64.gz
+ 62955eb36f4aac754b8491896cab84e200a30204             2823 main/binary-amd64/Packages
+ 9da0cc78322b37732930808f857a7bc31ebbd0c5             1500 main/binary-amd64/Packages.gz
+SHA256:
+ 14c30bb1bcf5cea8382e195f53b6daff476cb8f6d86bef3e3b4ecb7f37b6400d              163 Release
+ 1391dcc615fa4ee901fb087c154eb308a5218630f40200b6004640c7c583257a             6927 main/Contents-amd64
+ 3c06c0a05819b5b5180d409ff0acf2b5fc40f5ea1509770b393fe59791a6d2e3             1017 main/Contents-amd64.gz
+ d1e0fdee0a1c047020f617f96f30bef544e8df68cb9c315788652b3f8d9f25a4             2823 main/binary-amd64/Packages
+ 5e40963ceade11a6503fd528c877b37568e3316b9cd71faf42e14483c84e0b06             1500 main/binary-amd64/Packages.gz
+SHA512:
+ e30bd7bdc22037a53b44312b58c3a45fdd785dcb06064022a3ba801d36775f2199bcda6cf480e1a67cc462424b4419c26aa3b597b262bf84c1a2c89c44142635              163 Release
+ d0528129e57aa1ca1a3a711b868b21753626098746ba185c7e6acf186946157ba31e0054909d3a140cf4fa0725923f145ac563da5efe2cceb84f5f4a10ed1e0e             6927 main/Contents-amd64
+ 94b4df6c2e32a9fa00bd7854c881d45ea69544387ee833654ce70ae0e18542319210d9ed54489223b1ca54faf79ee2d3cdcc5f5c47f2701f71d16a1786494a5e             1017 main/Contents-amd64.gz
+ a87b462cddad13087999d79f27288fa70673dbd0064d4e638820969d4ff13e8ba7e23dc91c7618c245f336b21995637eaaa353e6c2336ebded1466612f32e3de             2823 main/binary-amd64/Packages
+ 0c47e6e552f43bfb4748468a6dd9f02ccf8846ffd2b859abee8540c67a1f74d6e3f79326caa46248df722b0594c967262580395494a39fc66951bba0fa17a73b             1500 main/binary-amd64/Packages.gz
