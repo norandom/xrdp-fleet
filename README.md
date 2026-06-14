@@ -4,8 +4,8 @@ Build a **custom xrdp 0.10.6 with RemoteFX *and* H.264 (GFX)** as `.deb`
 packages, and serve them from a **signed GitHub Pages apt repository** so all
 your machines install and stay updated with plain `apt`.
 
-Built for a small fleet (10+ Ubuntu / Linux Mint boxes) where stock xrdp eats
-too much bandwidth. The stock Ubuntu/Debian xrdp in the 0.9.x series has **no
+Built for a small fleet (10+ Ubuntu / Linux Mint / Kali boxes) where stock xrdp
+eats too much bandwidth. The stock Ubuntu/Debian xrdp in the 0.9.x series has **no
 H.264 at all** (the encoder is a stub) — you only get H.264 from **0.10.2+**.
 This repo rebuilds Debian's well-maintained 0.10.6 packaging, with both codecs
 already enabled, targeted at your exact distro releases.
@@ -89,8 +89,8 @@ shred -u fleet-xrdp-private.asc
 ```bash
 git tag v0.10.6-fleet1 && git push --tags     # or run the workflow manually
 ```
-CI builds noble+jammy in Docker, signs the repo, and publishes it to
-`https://norandom.github.io/xrdp-fleet/`.
+CI builds every codename in `config.env` (noble, jammy, kali-rolling) in Docker,
+signs the repo, and publishes it to `https://norandom.github.io/xrdp-fleet/`.
 
 ## Build locally (optional, to test before pushing)
 
@@ -106,10 +106,13 @@ make repo             # assemble + sign ./repo from ./out (needs the signing key
 ```bash
 curl -fsSL https://norandom.github.io/xrdp-fleet/install-client.sh | bash
 ```
-The script auto-detects the Ubuntu base (`noble`/`jammy` — it reads
-`UBUNTU_CODENAME`, so Linux Mint works), adds the signed repo, pins it, and
-installs `xrdp` + `xorgxrdp` without recommends. Thereafter `apt upgrade` keeps
-them current from your repo.
+The script auto-detects the suite — `UBUNTU_CODENAME` on Ubuntu/Mint
+(`noble`/`jammy`), `VERSION_CODENAME` on Kali (`kali-rolling`) — adds the signed
+repo, pins it, and installs `xrdp` + `xorgxrdp` without recommends. Thereafter
+`apt upgrade` keeps them current from your repo.
+
+> On Kali, stock `xrdp` (from Debian) usually already includes both codecs, so
+> this build is mainly for fleet uniformity/pinning rather than new capability.
 
 ---
 

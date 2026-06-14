@@ -29,7 +29,8 @@ for deb in "$OUT"/**/*.deb; do
   case "$base" in
     *~ubuntu24.04_*) suite="noble" ;;
     *~ubuntu22.04_*) suite="jammy" ;;
-    *) echo "WARN: cannot route '$base' to a suite (no ~ubuntuXX.04 tag); skipping"; continue ;;
+    *~kali_*)        suite="kali-rolling" ;;
+    *) echo "WARN: cannot route '$base' to a suite (unrecognized ~tag); skipping"; continue ;;
   esac
   mkdir -p "repo/pool/$suite/main"
   cp "$deb" "repo/pool/$suite/main/"

@@ -19,9 +19,10 @@ OUT="${OUT:-/out}"
 source "$WORK/config.env"
 
 case "$CODENAME" in
-  noble) RELTAG="ubuntu24.04" ;;
-  jammy) RELTAG="ubuntu22.04" ;;
-  *) echo "Unknown codename: $CODENAME (expected noble|jammy)"; exit 2 ;;
+  noble)        RELTAG="ubuntu24.04" ;;
+  jammy)        RELTAG="ubuntu22.04" ;;
+  kali-rolling) RELTAG="kali" ;;          # Kali tracks Debian testing/sid — no backport fixes needed
+  *) echo "Unknown codename: $CODENAME (expected noble|jammy|kali-rolling)"; exit 2 ;;
 esac
 
 export DEBIAN_FRONTEND=noninteractive

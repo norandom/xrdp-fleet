@@ -14,18 +14,21 @@ PAGES_URL="https://norandom.github.io/xrdp-fleet"
 REPO_ORIGIN="fleet-xrdp"
 REPO_LABEL="fleet-xrdp"
 
-# Detect the Ubuntu base codename. NOTE: on Linux Mint, VERSION_CODENAME is
-# the Mint codename (e.g. 'xia'); the Ubuntu base is in UBUNTU_CODENAME.
+# Detect the apt suite for this machine.
+#  - Ubuntu / Linux Mint: use UBUNTU_CODENAME (Mint's VERSION_CODENAME is the
+#    Mint name e.g. 'xia'; /etc/debian_version is irrelevant here).
+#  - Kali: no UBUNTU_CODENAME, so fall back to VERSION_CODENAME = kali-rolling.
 # shellcheck disable=SC1091
 . /etc/os-release
 CODENAME="${UBUNTU_CODENAME:-${VERSION_CODENAME:-}}"
 case "$CODENAME" in
-  noble|jammy) ;;
-  *) echo "Unsupported base '$CODENAME'. This repo serves noble (24.04) and jammy (22.04)." >&2
-     echo "On Mint, ensure UBUNTU_CODENAME is set in /etc/os-release." >&2
+  noble|jammy|kali-rolling) ;;
+  *) echo "Unsupported base '$CODENAME'. This repo serves: noble (Ubuntu 24.04 / Mint 22)," >&2
+     echo "jammy (Ubuntu 22.04 / Mint 21), and kali-rolling." >&2
+     echo "On Mint, UBUNTU_CODENAME in /etc/os-release should be noble or jammy." >&2
      exit 1 ;;
 esac
-echo ">> Detected Ubuntu base: $CODENAME"
+echo ">> Detected suite: $CODENAME"
 
 SUDO=""; [ "$(id -u)" -eq 0 ] || SUDO="sudo"
 

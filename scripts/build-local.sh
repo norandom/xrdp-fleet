@@ -14,8 +14,9 @@ TARGETS="${*:-$CODENAMES}"
 
 image_for() {
   case "$1" in
-    noble) echo "ubuntu:24.04" ;;
-    jammy) echo "ubuntu:22.04" ;;
+    noble)        echo "ubuntu:24.04" ;;
+    jammy)        echo "ubuntu:22.04" ;;
+    kali-rolling) echo "kalilinux/kali-rolling" ;;
     *) echo "" ;;
   esac
 }
