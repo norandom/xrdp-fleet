@@ -78,6 +78,36 @@ done
 
 # --- Public key for clients (dearmored, for Signed-By keyring) --------
 gpg --export "$KEYID" > pubkey.gpg
+
+# --- Landing page + client installer ---------------------------------
+# Publishes install-client.sh into the repo (so `curl <pages>/install-client.sh
+# | bash` works) and an index.html (so the root URL isn't a bare 404).
+cp ../client/install-client.sh ./install-client.sh
+cat > index.html <<HTML
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${REPO_LABEL} — xrdp apt repo</title>
+<style>body{font-family:system-ui,sans-serif;max-width:46rem;margin:3rem auto;padding:0 1rem;line-height:1.55}
+pre{background:#f4f4f4;border-radius:6px;padding:1rem;overflow:auto}code{background:#f4f4f4;border-radius:4px;padding:.1rem .3rem}</style>
+</head><body>
+<h1>${REPO_LABEL}</h1>
+<p>Custom <strong>xrdp ${XRDP_UPSTREAM}</strong> + matching xorgxrdp with <strong>RemoteFX and H.264</strong>,
+built per-distro and served as a GPG-signed apt repository. Suites: <code>${CODENAMES}</code> (amd64).</p>
+<h2>Install</h2>
+<pre>curl -fsSL ${PAGES_URL}/install-client.sh | bash</pre>
+<p>Auto-detects the Ubuntu base (noble / jammy; Linux Mint supported), adds this repo with
+GPG verification and an apt pin, then installs <code>xrdp</code> + <code>xorgxrdp</code>.</p>
+<h2>Contents</h2>
+<ul>
+<li><a href="install-client.sh">install-client.sh</a></li>
+<li><a href="pubkey.gpg">pubkey.gpg</a> — repo signing key</li>
+<li><code>dists/&lt;suite&gt;/</code> + <code>pool/&lt;suite&gt;/</code> — the archive</li>
+</ul>
+<p>Source &amp; docs: <a href="https://github.com/${GH_USER}/${GH_REPO}">github.com/${GH_USER}/${GH_REPO}</a></p>
+</body></html>
+HTML
+
 rm -f apt-ftparchive.conf
 
 echo "apt repo built in ./repo  (suites: $CODENAMES, key: $KEYID)"
