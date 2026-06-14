@@ -1,0 +1,10 @@
+# Reference copy — install-client.sh writes this automatically with the
+# correct Suites for the machine. Place at:
+#   /etc/apt/sources.list.d/fleet-xrdp.sources
+# Set Suites to the Ubuntu base codename of THIS machine: noble or jammy.
+Types: deb
+URIs: https://norandom.github.io/xrdp-fleet
+Suites: noble
+Components: main
+Architectures: amd64
+Signed-By: /etc/apt/keyrings/fleet-xrdp.gpg

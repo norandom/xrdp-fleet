@@ -1,0 +1,13 @@
+# Build artifacts
+/out/
+/repo/
+
+# Generated / secret material — never commit
+*.asc
+*.deb
+*.changes
+*.buildinfo
+gen-key-params
+pubkey.gpg
+private.asc
+fleet-xrdp-private.asc

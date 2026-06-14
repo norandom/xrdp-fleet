@@ -1,0 +1,8 @@
+# Reference copy — install-client.sh writes this automatically. Place at:
+#   /etc/apt/preferences.d/90-fleet-xrdp
+# Priority 1001 makes the fleet repo authoritative for its packages (xrdp,
+# xorgxrdp) over the distro, allows a downgrade if ever needed, and still
+# lets your own future rebuilds upgrade automatically.
+Package: *
+Pin: release o=fleet-xrdp,l=fleet-xrdp
+Pin-Priority: 1001

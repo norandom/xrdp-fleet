@@ -1,0 +1,68 @@
+name: build-and-publish-apt
+
+on:
+  push:
+    tags: ['v*']           # e.g. git tag v0.10.6-fleet1 && git push --tags
+  workflow_dispatch: {}    # or run manually from the Actions tab
+
+permissions:
+  contents: write          # peaceiris/actions-gh-pages pushes the gh-pages branch
+
+jobs:
+  build:
+    name: build (${{ matrix.codename }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { codename: noble, image: 'ubuntu:24.04' }
+          - { codename: jammy, image: 'ubuntu:22.04' }
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build xrdp + xorgxrdp in ${{ matrix.image }}
+        run: |
+          mkdir -p "out/${{ matrix.codename }}"
+          docker run --rm \
+            -v "$PWD":/work:ro \
+            -v "$PWD/out/${{ matrix.codename }}":/out \
+            "${{ matrix.image }}" \
+            bash /work/scripts/build-deb.sh "${{ matrix.codename }}"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: deb-${{ matrix.codename }}
+          path: out/${{ matrix.codename }}/*.deb
+          if-no-files-found: error
+
+  publish:
+    name: sign + publish apt repo
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Collect built .debs
+        uses: actions/download-artifact@v4
+        with:
+          path: out          # -> out/deb-noble/*.deb, out/deb-jammy/*.deb (make-repo.sh routes by version)
+
+      - name: Install repo tooling
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends apt-utils gnupg
+
+      - name: Import GPG signing key
+        run: printf '%s' "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import
+
+      - name: Build + sign apt repo
+        run: ./scripts/make-repo.sh out
+
+      - name: Publish to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./repo
+          publish_branch: gh-pages
+          force_orphan: true   # keep gh-pages a single clean snapshot
