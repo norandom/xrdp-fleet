@@ -56,10 +56,15 @@ build_one() {
   dpkg-source -x "${pkg}_${up}-${rev}.dsc" "src-${pkg}"
   pushd "src-${pkg}" >/dev/null
 
-  # jammy fix: systemd-dev was split out of systemd at v253; jammy ships 249,
-  # so the build-dep is unsatisfiable. libsystemd-dev provides the headers/.pc.
+  # jammy backport fixes (Debian sid packaging vs older Ubuntu 22.04):
+  #  - systemd-dev was split out of systemd at v253; jammy ships 249, so that
+  #    build-dep is unsatisfiable -> use libsystemd-dev (provides headers/.pc).
+  #  - /lib/lsb/init-functions moved from lsb-base into sysvinit-utils 3.06-4 in
+  #    sid; jammy still has lsb-base + sysvinit-utils 3.01, so the runtime dep
+  #    "sysvinit-utils (>= 3.06-4)" is unsatisfiable -> revert it to lsb-base.
   if [ "$CODENAME" = "jammy" ]; then
     sed -i -E 's/([[:space:],])systemd-dev\b/\1libsystemd-dev/g' debian/control
+    sed -i -E 's/sysvinit-utils \(>= [^)]*\)/lsb-base/g'         debian/control
   fi
 
   # Stamp a fleet version that outranks the distro package and is unique per
@@ -72,15 +77,33 @@ build_one() {
   dpkg-buildpackage -us -uc -b
   popd >/dev/null
 
-  cp ./*.deb "$OUT"/
-  rm -rf "src-${pkg}" ./*.deb ./*.dsc ./*.tar.* ./*.changes ./*.buildinfo 2>/dev/null || true
+  # Keep the built .debs in $BUILD (xrdp's are needed to build xorgxrdp);
+  # clean only the unpacked source tree + downloaded source files.
+  rm -rf "src-${pkg}" "${pkg}"_*.dsc "${pkg}"_*.orig.tar.* "${pkg}"_*.debian.tar.* 2>/dev/null || true
 }
 
+# 1) Build xrdp.
 build_one xrdp     "$XRDP_UPSTREAM"     "$XRDP_DEBREV" \
           "${XRDP_UPSTREAM}-${XRDP_DEBREV}~fleet${FLEET_REV}~${RELTAG}"
 
+# 2) Install the freshly-built xrdp so it satisfies xorgxrdp's build-dependency
+#    "xrdp (>= 0.10.5)" — the container's stock xrdp is 0.9.x and too old.
+#    (Side benefit: validates the runtime dep chain — pulls libx264/libopenh264/...)
+apt-get install -y --no-install-recommends "$BUILD"/xrdp_*.deb
+
+# 3) Build the matching xorgxrdp against it.
 build_one xorgxrdp "$XORGXRDP_UPSTREAM" "$XORGXRDP_DEBREV" \
           "${XORGXRDP_EPOCH}:${XORGXRDP_UPSTREAM}-${XORGXRDP_DEBREV}~fleet${FLEET_REV}~${RELTAG}"
+
+# 4) Collect the real package .debs (skip the equivs *-build-deps / dbgsym).
+rm -f "$OUT"/*.deb
+shopt -s nullglob
+for d in "$BUILD"/*.deb; do
+  case "$(basename "$d")" in
+    *-build-deps_*.deb|*-dbgsym_*.deb) continue ;;
+  esac
+  cp "$d" "$OUT"/
+done
 
 # When run locally, hand artifacts back to the host user (CI leaves them root).
 if [ -n "${HOST_UID:-}" ] && [ -n "${HOST_GID:-}" ]; then

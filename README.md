@@ -130,19 +130,25 @@ them current from your repo.
    0.9.x xorgxrdp will produce broken/garbled GFX against this xrdp. This repo
    always builds and ships the matching `xorgxrdp 0.10.5`; the client installer
    installs it explicitly. Don't mix.
-2. **jammy `systemd-dev` fix is automatic.** jammy (systemd 249) lacks the
-   `systemd-dev` build-dep (split out at systemd 253); `build-deb.sh` rewrites
-   it to `libsystemd-dev`. If a future xrdp needs `systemdsystemunitdir` and
-   the build errors on it, add `--with-systemdsystemunitdir=/lib/systemd/system`
-   via a `debian/rules` override.
-3. **Versions use a `~fleetN~ubuntuXX.04` suffix**, which sorts *below* a
+2. **jammy backport fixes are automatic** (Debian sid packaging vs Ubuntu 22.04).
+   `build-deb.sh` applies two, gated on `jammy`:
+   - `systemd-dev` build-dep → `libsystemd-dev` (systemd-dev was split out at
+     systemd 253; jammy ships 249).
+   - `sysvinit-utils (>= 3.06-4)` runtime dep → `lsb-base` (`/lib/lsb/init-functions`
+     moved into sysvinit-utils in sid; jammy still uses lsb-base).
+   noble needs neither. If a future xrdp needs `systemdsystemunitdir` and the
+   build errors on it, add `--with-systemdsystemunitdir=/lib/systemd/system` via
+   a `debian/rules` override.
+3. **xrdp is installed before xorgxrdp** during the build, because xorgxrdp
+   build-depends on `xrdp (>= 0.10.5)`; `build-deb.sh` handles this ordering.
+4. **Versions use a `~fleetN~ubuntuXX.04` suffix**, which sorts *below* a
    hypothetical official `0.10.6-1`. The `Pin-Priority: 1001` is what
    guarantees your build wins regardless — keep the pin in place.
-4. **Per-codename builds are mandatory.** A noble `.deb` is not reliably
+5. **Per-codename builds are mandatory.** A noble `.deb` is not reliably
    installable on jammy and vice-versa; that's by design.
-5. **openh264** comes from Ubuntu **universe** (source-built, not the Cisco
+6. **openh264** comes from Ubuntu **universe** (source-built, not the Cisco
    binary blob). Default Ubuntu container images have universe enabled.
-6. **amd64 only** here (`nasm`-built RemoteFX SIMD is amd64). Extend the matrix
+7. **amd64 only** here (`nasm`-built RemoteFX SIMD is amd64). Extend the matrix
    for other arches if needed.
 
 ---

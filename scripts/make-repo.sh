@@ -37,17 +37,20 @@ for deb in "$OUT"/**/*.deb; do
 done
 [ "$found" -gt 0 ] || { echo "No .debs found under '$OUT/' — run scripts/build-local.sh first."; exit 1; }
 
-# --- Generate apt-ftparchive config (per-codename pool via \$(DIST)) ---
+# --- Generate apt-ftparchive config ----------------------------------
+# Note: apt-ftparchive's $(DIST) expands to the FULL tree name (e.g.
+# "dists/noble"), so the default Packages path "$(DIST)/$(SECTION)/binary-
+# $(ARCH)/Packages" already resolves correctly — don't re-prefix it. We only
+# override Directory per-tree to point at that codename's isolated pool, which
+# is what guarantees a suite never indexes another codename's .debs.
+# BinCacheDB "" disables the cache db (avoids a stray permission error).
 cd repo
 {
   echo 'Dir { ArchiveDir "."; };'
-  echo 'Default { Packages::Compress ". gzip"; };'
-  echo 'TreeDefault {'
-  echo '  Directory "pool/$(DIST)/$(SECTION)";'
-  echo '  Packages  "dists/$(DIST)/$(SECTION)/binary-$(ARCH)/Packages";'
-  echo '};'
+  echo 'Default { Packages::Compress ". gzip"; Contents::Compress ". gzip"; };'
+  echo 'TreeDefault { BinCacheDB "/tmp/xrdp-fleet-aptcache-$(ARCH).db"; };'
   for SUITE in $CODENAMES; do
-    echo "Tree \"dists/$SUITE\" { Sections \"main\"; Architectures \"amd64\"; }"
+    echo "Tree \"dists/$SUITE\" { Directory \"pool/$SUITE/\$(SECTION)\"; Sections \"main\"; Architectures \"amd64\"; }"
   done
 } > apt-ftparchive.conf
 
