@@ -28,7 +28,7 @@ esac
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
 apt-get install -y --no-install-recommends \
-  build-essential devscripts equivs dpkg-dev ca-certificates wget xz-utils
+  build-essential devscripts equivs dpkg-dev ca-certificates wget xz-utils quilt
 
 mkdir -p "$OUT"
 BUILD="$(mktemp -d)"
@@ -66,6 +66,19 @@ build_one() {
   if [ "$CODENAME" = "jammy" ]; then
     sed -i -E 's/([[:space:],])systemd-dev\b/\1libsystemd-dev/g' debian/control
     sed -i -E 's/sysvinit-utils \(>= [^)]*\)/lsb-base/g'         debian/control
+  fi
+
+  # Apply fleet source patches for this package (quilt), if any live under
+  # /work/patches/<pkg>/*.patch. dpkg-source -x has already applied the distro
+  # series; register ours and push them on so they become part of the build.
+  if ls "$WORK/patches/$pkg"/*.patch >/dev/null 2>&1; then
+    mkdir -p debian/patches
+    for p in "$WORK/patches/$pkg"/*.patch; do
+      cp "$p" debian/patches/
+      grep -qxF "$(basename "$p")" debian/patches/series 2>/dev/null \
+        || echo "$(basename "$p")" >> debian/patches/series
+    done
+    QUILT_PATCHES=debian/patches quilt push -a   # set -e aborts if a patch won't apply
   fi
 
   # Stamp a fleet version that outranks the distro package and is unique per

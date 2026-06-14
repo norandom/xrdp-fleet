@@ -1,0 +1,72 @@
+Description: Chroma-only quantization tuning for the CLASSIC RemoteFX path
+ (max_bpp=24). On that path xrdp calls rfxcodec_encode with quants=NULL, so
+ librfxcodec used a single default quant vector for Y, Cb AND Cr — meaning you
+ could not refine chroma without also spending bytes on luma.
+ .
+ This makes the default a TWO-set table: set [0] = luma (unchanged), set [1] =
+ a finer chroma vector (tighter mid/high sub-bands). The classic tile loops are
+ taught to point Cb/Cr at set [1] when the built-in default is in use (cidx),
+ while callers that supply their own quants keep per-tile indexing (cidx = -1).
+ Result: sharper colour / less hue around text with luma bandwidth untouched.
+ .
+ numQuants becomes 2 only for the default path; the extra 5-byte quant array is
+ spec-legal (MS-RDPRFX allows multiple quant arrays + per-tile indices) and
+ clients (mstsc/FreeRDP) decode it natively. The progressive region composer
+ (rfx_compose_message_region) still sets num_quants=1 explicitly, so it reads
+ only set [0] and is unaffected. Only the YUV tile loops are touched (xrdp
+ encodes RFX_FORMAT_YUV); the RGB/ARGB loops are left as-is.
+ .
+ Sub-band order: LL3, LH3, HL3, HH3, LH2, HL2, HH2, LH1, HL1, HH1. Tunable:
+ lower the set [1] nibbles for crisper chroma / more bytes.
+ .
+ Scope: bundled librfxcodec in the xrdp source; classic RFX only. The GFX
+ Progressive path (max_bpp=32) is tuned in xrdp/xrdp_encoder.c
+ (fleet-rfx-chroma-quant.patch).
+Author: xrdp-fleet
+Forwarded: not-needed
+Last-Update: 2026-06-14
+--- a/librfxcodec/src/rfxencode_compose.c
++++ b/librfxcodec/src/rfxencode_compose.c
+@@ -51,4 +51,5 @@
+ static const unsigned char g_rfx_default_quantization_values[] =
+ {
+-    0x66, 0x66, 0x77, 0x88, 0x98
++    0x66, 0x66, 0x77, 0x88, 0x98, /* [0] luma (unchanged) */
++    0x66, 0x66, 0x66, 0x77, 0x87  /* [1] chroma: finer mid/high, less hue (fleet) */
+ };
+@@ -417,4 +418,5 @@
+     int quantIdxY;
+     int quantIdxCb;
+     int quantIdxCr;
++    int cidx;
+     int numTiles;
+@@ -429,10 +431,12 @@
+     if (quants == 0)
+     {
+-        numQuants = 1;
++        numQuants = 2;
+         quantVals = (const char *) g_rfx_default_quantization_values;
++        cidx = 1; /* fleet: Cb/Cr use the finer default chroma quant set */
+     }
+     else
+     {
+         numQuants = num_quants;
+         quantVals = quants;
++        cidx = -1; /* caller-supplied quants: keep per-tile indexing */
+     }
+@@ -477,5 +481,5 @@
+                 quantIdxY = tiles[index].quant_y;
+-                quantIdxCb = tiles[index].quant_cb;
+-                quantIdxCr = tiles[index].quant_cr;
++                quantIdxCb = cidx < 0 ? tiles[index].quant_cb : cidx;
++                quantIdxCr = cidx < 0 ? tiles[index].quant_cr : cidx;
+                 tile_data = buf + (y << 8) * (stride_bytes >> 8) + (x << 8);
+                 if (rfx_compose_message_tile_yuva(enc, s,
+@@ -501,5 +505,5 @@
+                 quantIdxY = tiles[index].quant_y;
+-                quantIdxCb = tiles[index].quant_cb;
+-                quantIdxCr = tiles[index].quant_cr;
++                quantIdxCb = cidx < 0 ? tiles[index].quant_cb : cidx;
++                quantIdxCr = cidx < 0 ? tiles[index].quant_cr : cidx;
+                 tile_data = buf + (y << 8) * (stride_bytes >> 8) + (x << 8);
+                 if (rfx_compose_message_tile_yuv(enc, s,
