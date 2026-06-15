@@ -1,37 +1,33 @@
 # xrdp-fleet
 
-Build a **custom xrdp 0.10.6 with RemoteFX *and* H.264 (GFX)** as `.deb`
-packages, and serve them from a **signed GitHub Pages apt repository** so all
-your machines install and stay updated with plain `apt`.
+Build custom xrdp 0.10.6 `.deb` packages with RemoteFX and H.264 (GFX), then
+serve them from a signed GitHub Pages apt repository. Client machines install
+and update through normal `apt` commands.
 
-Built for a small fleet (10+ Ubuntu / Linux Mint / Kali boxes) where stock xrdp
-eats too much bandwidth. The stock Ubuntu/Debian xrdp in the 0.9.x series has **no
-H.264 at all** (the encoder is a stub) — you only get H.264 from **0.10.2+**.
-This repo rebuilds Debian's well-maintained 0.10.6 packaging, with both codecs
-already enabled, targeted at your exact distro releases.
+This is for a small fleet of Ubuntu, Linux Mint, and Kali machines where stock
+xrdp uses too much bandwidth. The Ubuntu/Debian xrdp 0.9.x packages do not have
+working H.264 support. The encoder is only a stub there; real H.264 support
+starts in xrdp 0.10.2. This repo rebuilds Debian's 0.10.6 packaging with both
+codecs enabled for each target distro release.
 
 > Want the codec/bandwidth tuning details? See [docs/TUNING.md](docs/TUNING.md).
-
----
 
 ## How it controls "dependency explosion"
 
 The thing that makes cross-distro `.deb` builds blow up is `dpkg-shlibdeps`
-baking in whatever library versions were present *at build time*. The defenses
-here:
+baking in the library versions present at build time. This repo avoids that in
+three ways:
 
-1. **Build inside the exact target distro.** Each `.deb` is compiled in an
+1. Build inside the target distro. Each `.deb` is compiled in an
    `ubuntu:24.04` or `ubuntu:22.04` container, so its `Depends:` only ever
    reference libraries that exist on that release. A noble build is published
    only to the noble suite; a jammy build only to jammy.
-2. **Per-codename apt suites and pools.** `dists/noble` and `dists/jammy` each
-   index **only** their own `pool/<codename>/`, so a jammy machine can never be
+2. Use per-codename apt suites and pools. `dists/noble` and `dists/jammy` each
+   index only their own `pool/<codename>/`, so a jammy machine can never be
    offered a noble-built package.
-3. **`--no-install-recommends` + apt pinning** on the client, so installing
-   xrdp doesn't drag in optional extras, and your build wins over (and is never
-   clobbered by) the distro package.
-
----
+3. Use `--no-install-recommends` and apt pinning on the client. Installing xrdp
+   does not drag in optional extras, and your build keeps priority over the
+   distro package.
 
 ## Repository layout
 
@@ -51,22 +47,19 @@ client/
 docs/TUNING.md              # codec + bandwidth tuning
 ```
 
-Nothing from upstream xrdp is vendored — `build-deb.sh` fetches the pinned
-Debian **source** package (`xrdp_0.10.6-5`, `xorgxrdp_0.10.5-2`) at build time.
-
----
+Nothing from upstream xrdp is vendored. `build-deb.sh` fetches the pinned Debian
+source packages, `xrdp_0.10.6-5` and `xorgxrdp_0.10.5-2`, at build time.
 
 ## What gets built
 
 | Package | Upstream | Codecs |
 |---|---|---|
 | `xrdp` | 0.10.6 | RemoteFX (`--enable-rfxcodec`) + H.264 (`--enable-x264` + `--enable-openh264`), plus jpeg, opus, mp3lame, fuse, pam, vsock |
-| `xorgxrdp` | 0.10.5 | the matching Xorg backend — **must** match xrdp's 0.10.x ABI (see caveats) |
+| `xorgxrdp` | 0.10.5 | matching Xorg backend for xrdp's 0.10.x ABI. Do not mix this with 0.9.x xorgxrdp. |
 
-The Debian 0.10.6 `debian/rules` already enables both codecs, so **no rules
-patch is applied** — we only restamp the version per codename.
-
----
+The Debian 0.10.6 `debian/rules` file already enables both codecs, so this repo
+does not patch the build rules. It only restamps the package version per
+codename.
 
 ## One-time setup
 
@@ -84,7 +77,7 @@ shred -u fleet-xrdp-private.asc
 #    Branch = gh-pages / root. (The first CI run creates the branch.)
 ```
 
-## Build & publish (CI)
+## Build and publish with CI
 
 ```bash
 git tag v0.10.6-fleet1 && git push --tags     # or run the workflow manually
@@ -92,9 +85,9 @@ git tag v0.10.6-fleet1 && git push --tags     # or run the workflow manually
 CI builds every codename in `config.env` (noble, jammy, kali-rolling) in Docker,
 signs the repo, and publishes it to `https://norandom.github.io/xrdp-fleet/`.
 
-## Build locally (optional, to test before pushing)
+## Build locally
 
-Needs Docker. Produces `.deb`s under `./out/`:
+Local builds need Docker and write `.deb` files under `./out/`:
 ```bash
 make build            # both codenames
 make build-noble      # just one
@@ -106,59 +99,54 @@ make repo             # assemble + sign ./repo from ./out (needs the signing key
 ```bash
 curl -fsSL https://norandom.github.io/xrdp-fleet/install-client.sh | bash
 ```
-The script auto-detects the suite — `UBUNTU_CODENAME` on Ubuntu/Mint
-(`noble`/`jammy`), `VERSION_CODENAME` on Kali (`kali-rolling`) — adds the signed
-repo, pins it, and installs `xrdp` + `xorgxrdp` without recommends. Thereafter
-`apt upgrade` keeps them current from your repo.
+The script detects the suite from `UBUNTU_CODENAME` on Ubuntu/Mint
+(`noble`/`jammy`) or `VERSION_CODENAME` on Kali (`kali-rolling`). It then adds
+the signed repo, pins it, and installs `xrdp` and `xorgxrdp` without recommends.
+After that, `apt upgrade` keeps them current from your repo.
 
 > On Kali, stock `xrdp` (from Debian) usually already includes both codecs, so
 > this build is mainly for fleet uniformity/pinning rather than new capability.
 
----
-
 ## Updating later
 
-- **Ship a fresh rebuild of the same xrdp:** bump `FLEET_REV` in `config.env`
-  (`1` → `2`), tag, push. Clients auto-upgrade (higher version sorts higher).
-- **Take a newer upstream xrdp:** update `XRDP_UPSTREAM` / `XRDP_DEBREV` (and
-  xorgxrdp) in `config.env` to the current sid version
-  (https://packages.debian.org/sid/xrdp), then tag & push.
-
----
+- To ship a fresh rebuild of the same xrdp, bump `FLEET_REV` in `config.env`
+  (`1` to `2`), tag, and push. Clients auto-upgrade because the higher version
+  sorts higher.
+- To take a newer upstream xrdp, update `XRDP_UPSTREAM`, `XRDP_DEBREV`, and the
+  xorgxrdp values in `config.env` to the current sid version
+  (https://packages.debian.org/sid/xrdp), then tag and push.
 
 ## Caveats (read these)
 
-1. **xorgxrdp must match — highest risk.** xrdp ↔ xorgxrdp talk over a private
-   local IPC + shared-memory framebuffer that changed in 0.10.x. The distro's
-   0.9.x xorgxrdp will produce broken/garbled GFX against this xrdp. This repo
-   always builds and ships the matching `xorgxrdp 0.10.5`; the client installer
-   installs it explicitly. Don't mix.
-2. **jammy backport fixes are automatic** (Debian sid packaging vs Ubuntu 22.04).
-   `build-deb.sh` applies two, gated on `jammy`:
-   - `systemd-dev` build-dep → `libsystemd-dev` (systemd-dev was split out at
+1. xrdp and xorgxrdp must match. They talk over private local IPC and a
+   shared-memory framebuffer that changed in 0.10.x. The distro's 0.9.x
+   xorgxrdp will produce broken or garbled GFX against this xrdp. This repo
+   always builds and ships the matching `xorgxrdp 0.10.5`, and the client
+   installer installs it explicitly.
+2. jammy backport fixes are automatic. `build-deb.sh` applies two fixes for
+   Debian sid packaging on Ubuntu 22.04, gated on `jammy`:
+   - `systemd-dev` build-dep to `libsystemd-dev` (systemd-dev was split out at
      systemd 253; jammy ships 249).
-   - `sysvinit-utils (>= 3.06-4)` runtime dep → `lsb-base` (`/lib/lsb/init-functions`
+   - `sysvinit-utils (>= 3.06-4)` runtime dep to `lsb-base` (`/lib/lsb/init-functions`
      moved into sysvinit-utils in sid; jammy still uses lsb-base).
    noble needs neither. If a future xrdp needs `systemdsystemunitdir` and the
    build errors on it, add `--with-systemdsystemunitdir=/lib/systemd/system` via
    a `debian/rules` override.
-3. **xrdp is installed before xorgxrdp** during the build, because xorgxrdp
+3. xrdp is installed before xorgxrdp during the build, because xorgxrdp
    build-depends on `xrdp (>= 0.10.5)`; `build-deb.sh` handles this ordering.
-4. **Versions use a `~fleetN~ubuntuXX.04` suffix**, which sorts *below* a
+4. Versions use a `~fleetN~ubuntuXX.04` suffix, which sorts below a
    hypothetical official `0.10.6-1`. The `Pin-Priority: 1001` is what
-   guarantees your build wins regardless — keep the pin in place.
-5. **Per-codename builds are mandatory.** A noble `.deb` is not reliably
-   installable on jammy and vice-versa; that's by design.
-6. **openh264** comes from Ubuntu **universe** (source-built, not the Cisco
+   guarantees your build wins regardless. Keep the pin in place.
+5. Per-codename builds are required. A noble `.deb` is not reliably installable
+   on jammy, and the reverse is also true.
+6. openh264 comes from Ubuntu universe (source-built, not the Cisco
    binary blob). Default Ubuntu container images have universe enabled.
-7. **amd64 only** here (`nasm`-built RemoteFX SIMD is amd64). Extend the matrix
-   for other arches if needed.
-
----
+7. This repo builds amd64 only (`nasm`-built RemoteFX SIMD is amd64). Extend the
+   matrix for other arches if needed.
 
 ## Why not just `apt source xrdp` + edit `debian/rules`?
 
 That was the original plan, but on the 0.9.24 source tree the H.264 flags
-(`--enable-gfx-avc444` etc.) don't exist — autoconf silently ignores unknown
-`--enable-*` flags, so you'd ship a package that builds fine and contains **no
-H.264**. Real H.264 needs the 0.10.x line, which is what this repo builds.
+(`--enable-gfx-avc444` and related flags) do not exist. Autoconf silently
+ignores unknown `--enable-*` flags, so the package builds but still has no
+H.264 support. Real H.264 needs the 0.10.x line, which is what this repo builds.
