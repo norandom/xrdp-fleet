@@ -11,15 +11,18 @@ starts in xrdp 0.10.2. This repo rebuilds Debian's 0.10.6 packaging with both
 codecs enabled for each target distro release.
 
 > **Architectural limitation -- full-screen snapshots.** `xorgxrdp` captures
-> the entire screen as a bitmap on every frame. Unlike Windows RDP, where the
-> GDI subsystem tells the protocol exactly which screen region changed and how
-> to draw it, Linux xrdp has no equivalent fine-grained damage tracking. This
-> means every frame carries full-screen pixel data regardless of what actually
-> changed. The H.264 graphics pipeline (GFX / x264) is **not** more effective
-> than RemoteFX 24-bit in this architecture -- both still encode a full-screen
-> snapshot per frame. Capping the frame rate is the most effective bandwidth
-> knob available today. This project cannot overcome these architectural limits;
-> it only ensures both codecs are actually compiled in (unlike distro packages
+> the entire screen as a bitmap on every frame, encoding it in 64x64 tiles.
+> Unlike Windows RDP, where the GDI subsystem tells the protocol exactly which
+> screen region changed and how to draw it, Linux xrdp has no equivalent
+> fine-grained damage tracking. This means every frame carries full-screen
+> pixel data regardless of what actually changed. The H.264 graphics pipeline
+> (GFX / x264) is **not** more effective than RemoteFX 24-bit in this
+> architecture -- both still encode a full-screen snapshot per frame.
+> [IronRDP](https://github.com/Devolutions/IronRDP) implements a mix of RFX
+> and H.264 that could improve this, but there is no IronRDP-based Linux RDP
+> server yet. Capping the frame rate is the most effective bandwidth knob
+> available today. This project cannot overcome these architectural limits; it
+> only ensures both codecs are actually compiled in (unlike distro packages
 > that ship a stub encoder).
 
 > Want the codec/bandwidth tuning details? See [docs/TUNING.md](docs/TUNING.md).
